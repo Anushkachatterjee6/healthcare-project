@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Analysis — SIFT + RANSAC | HER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="brand">HER <span>Biomedical Imaging</span></div>
+    <nav>
+      <a href="/">Tutorials</a>
+      <a class="active-link" href="/image-analysis">Image Analysis</a>
+    </nav>
+  </header>
+
+  <main class="analysis-wrap">
+    <section class="panel controls-panel">
+      <p class="eyebrow">T5 — Biomedical Image Analysis</p>
+      <h1>IMAGE ANALYSIS — SIFT + RANSAC</h1>
+      <p class="explain">
+        SIFT detects distinctive local features in the MRI images.
+        RANSAC removes geometrically inconsistent feature matches and
+        retains robust correspondences.
+      </p>
+
+      <div class="controls-grid">
+        <label>
+          Patient / Case
+          <select id="caseSelect"></select>
+        </label>
+        <label>
+          Modality
+          <select id="modalitySelect"></select>
+        </label>
+        <label>
+          Slice 1
+          <input id="slice1" type="number" min="0" value="0" />
+        </label>
+        <label>
+          Slice 2
+          <input id="slice2" type="number" min="0" value="2" />
+        </label>
+      </div>
+
+      <div class="cta-row">
+        <button id="runBtn" class="btn primary">Run SIFT + RANSAC Analysis</button>
+        <span id="sliceHint" class="hint"></span>
+      </div>
+      <p id="statusMsg" class="status" role="status"></p>
+    </section>
+
+    <section class="panel doc-panel">
+      <h2>Pipeline</h2>
+      <p class="pipeline">
+        MRI slices → preprocessing → SIFT keypoints → descriptors →
+        feature matching → RANSAC → inlier matches → visualization
+      </p>
+      <div class="doc-cols">
+        <div>
+          <h3>SIFT</h3>
+          <p>Scale-Invariant Feature Transform detects local distinctive features and creates descriptors.</p>
+        </div>
+        <div>
+          <h3>RANSAC</h3>
+          <p>Random Sample Consensus identifies geometrically consistent matches and rejects outliers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel results hidden" id="results">
+      <div class="stats" id="stats"></div>
+
+      <h2>Original MRI</h2>
+      <div class="pair">
+        <figure>
+          <figcaption>Original Slice 1</figcaption>
+          <img id="orig1" alt="Original MRI slice 1" />
+        </figure>
+        <figure>
+          <figcaption>Original Slice 2</figcaption>
+          <img id="orig2" alt="Original MRI slice 2" />
+        </figure>
+      </div>
+
+      <h2>SIFT Keypoints</h2>
+      <div class="pair">
+        <figure>
+          <figcaption>SIFT Keypoints — Slice 1</figcaption>
+          <img id="sift1" alt="SIFT keypoints on slice 1" />
+        </figure>
+        <figure>
+          <figcaption>SIFT Keypoints — Slice 2</figcaption>
+          <img id="sift2" alt="SIFT keypoints on slice 2" />
+        </figure>
+      </div>
+
+      <h2>SIFT Feature Matches</h2>
+      <figure class="wide">
+        <figcaption>Good SIFT Matches (after Lowe ratio test)</figcaption>
+        <img id="matches" alt="SIFT feature matches" />
+      </figure>
+
+      <h2 class="hero-result-title">RANSAC Inlier Matches</h2>
+      <figure class="wide hero-result">
+        <figcaption>Final robust correspondences retained by RANSAC</figcaption>
+        <img id="ransac" alt="RANSAC inlier matches" />
+      </figure>
+    </section>
+  </main>
+
+  <script src="/static/image-analysis.js"></script>
+</body>
+</html>

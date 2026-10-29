@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HER Biomedical Image Tutorials</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="brand">HER <span>Biomedical Imaging</span></div>
+    <nav>
+      <a href="/">Tutorials</a>
+      <a class="active-link" href="/image-analysis">Image Analysis</a>
+    </nav>
+  </header>
+
+  <main class="home-wrap">
+    <section class="hero-panel">
+      <p class="eyebrow">BraTS-style MRI / NIfTI workflow</p>
+      <h1>Biomedical Image Processing &amp; Analysis</h1>
+      <p class="lede">
+        Tutorial stack T1–T6 for brain MRI understanding, preprocessing,
+        processing, analysis, and visualization — with a live SIFT + RANSAC demo.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="/image-analysis">Open Image Analysis (T5)</a>
+      </div>
+    </section>
+
+    <section class="tutorial-grid">
+      <article><h3>T1</h3><p>Understanding HER / biomedical MRI data</p></article>
+      <article><h3>T2</h3><p>Preprocessing — standardization &amp; cleaning</p></article>
+      <article><h3>T3</h3><p>Redundant data removal &amp; missing data</p></article>
+      <article><h3>T4</h3><p>Enhancement, restoration, segmentation, compression</p></article>
+      <article class="highlight">
+        <h3>T5</h3>
+        <p>Biomedical image analysis — SIFT, RANSAC, CNN</p>
+        <a href="/image-analysis">Run SIFT + RANSAC →</a>
+      </article>
+      <article><h3>T6</h3><p>Biomedical image visualization</p></article>
+    </section>
+  </main>
+</body>
+</html>
