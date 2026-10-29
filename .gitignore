@@ -8,3 +8,9 @@ node_modules/
 .next/
 dist/
 build/
+BraTS2020/
+*.tar
+*.keras
+*.h5
+artifacts/
+.pytest_cache/

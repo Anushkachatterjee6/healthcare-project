@@ -6,8 +6,7 @@ import json
 from pathlib import Path
 
 NB_PATHS = [
-    Path(r"C:\Users\Anushka\Downloads\HER_Biomedical_Image_Tutorials\HER_Biomedical_Image_Tutorials_T1_T6.ipynb"),
-    Path(r"C:\Users\Anushka\Downloads\HER_Biomedical_Image_Tutorials_T1_T6.ipynb"),
+    Path(__file__).resolve().parents[1] / "HER_Biomedical_Image_Tutorials_T1_T6.ipynb",
 ]
 
 

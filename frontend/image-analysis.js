@@ -152,5 +152,5 @@
   modalitySelect.addEventListener("change", refreshMeta);
   runBtn.addEventListener("click", runAnalysis);
 
-  loadCases();
+  loadCases().catch(() => setStatus("Cannot connect to backend. Start run_server.bat and open http://127.0.0.1:8000/image-analysis", "err"));
 })();

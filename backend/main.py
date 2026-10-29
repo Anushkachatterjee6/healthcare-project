@@ -32,15 +32,15 @@ from her_core.sift_ransac import analyze_mri_sift_ransac  # noqa: E402
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
 app = FastAPI(
-    title="HER Biomedical Image Analysis",
-    description="T1–T6 biomedical MRI tutorials with SIFT + RANSAC image analysis",
-    version="1.0.0",
+    title="HER Healthcare Analytics Laboratory",
+    description="T1–T15: MRI processing, operational analytics, clinical text and exploratory research",
+    version="2.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["http://127.0.0.1:8000", "http://localhost:8000", "http://127.0.0.1:5500", "http://localhost:5500"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -60,6 +60,7 @@ class SiftRansacRequest(BaseModel):
 
 
 def _get_case(case_id: str, data_root: str | None = None) -> dict:
+    _validate_data_root(data_root)
     cases = discover_cases(data_root or default_data_root())
     for case in cases:
         if case["case_id"] == case_id:
@@ -67,9 +68,16 @@ def _get_case(case_id: str, data_root: str | None = None) -> dict:
     raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
 
 
+def _validate_data_root(data_root):
+    if data_root is not None and Path(data_root).resolve() != default_data_root().resolve():
+        raise HTTPException(400, "API dataset root must be the project's BraTS2020 folder")
+
+
 def _load_volume_cached(case: dict, modality: str):
-    key = (case["case_id"], modality.lower())
+    key = (str(case['path'].resolve()), modality.lower())
     if key not in _VOLUME_CACHE:
+        if len(_VOLUME_CACHE) >= 4:
+            _VOLUME_CACHE.pop(next(iter(_VOLUME_CACHE)))
         volume, _, path = load_case_modality(case, modality.lower())
         _VOLUME_CACHE[key] = {"volume": volume, "path": str(path)}
     return _VOLUME_CACHE[key]
@@ -88,6 +96,7 @@ def health():
 
 @app.get("/api/cases")
 def api_cases(data_root: str | None = None):
+    _validate_data_root(data_root)
     cases = discover_cases(data_root or default_data_root())
     payload = []
     for case in cases:
@@ -198,6 +207,9 @@ def serve_home():
 def serve_image_analysis():
     return FileResponse(FRONTEND_DIR / "image-analysis.html")
 
+
+from backend.tutorials import router as tutorial_router
+app.include_router(tutorial_router)
 
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")

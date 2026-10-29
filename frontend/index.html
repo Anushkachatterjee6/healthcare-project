@@ -1,49 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HER Biomedical Image Tutorials</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HER | Healthcare Analytics Laboratory</title><link rel="stylesheet" href="/static/lab.css"><script src="/static/results-renderer.js" defer></script><script src="/static/lab.js" defer></script></head>
 <body>
-  <div class="bg-grid"></div>
-  <header class="topbar">
-    <div class="brand">HER <span>Biomedical Imaging</span></div>
-    <nav>
-      <a href="/">Tutorials</a>
-      <a class="active-link" href="/image-analysis">Image Analysis</a>
-    </nav>
-  </header>
-
-  <main class="home-wrap">
-    <section class="hero-panel">
-      <p class="eyebrow">BraTS-style MRI / NIfTI workflow</p>
-      <h1>Biomedical Image Processing &amp; Analysis</h1>
-      <p class="lede">
-        Tutorial stack T1–T6 for brain MRI understanding, preprocessing,
-        processing, analysis, and visualization — with a live SIFT + RANSAC demo.
-      </p>
-      <div class="cta-row">
-        <a class="btn primary" href="/image-analysis">Open Image Analysis (T5)</a>
-      </div>
-    </section>
-
-    <section class="tutorial-grid">
-      <article><h3>T1</h3><p>Understanding HER / biomedical MRI data</p></article>
-      <article><h3>T2</h3><p>Preprocessing — standardization &amp; cleaning</p></article>
-      <article><h3>T3</h3><p>Redundant data removal &amp; missing data</p></article>
-      <article><h3>T4</h3><p>Enhancement, restoration, segmentation, compression</p></article>
-      <article class="highlight">
-        <h3>T5</h3>
-        <p>Biomedical image analysis — SIFT, RANSAC, CNN</p>
-        <a href="/image-analysis">Run SIFT + RANSAC →</a>
-      </article>
-      <article><h3>T6</h3><p>Biomedical image visualization</p></article>
-    </section>
-  </main>
-</body>
-</html>
+<aside><a class="brand" href="/">H<span>+</span>R <small>HEALTHCARE ANALYTICS</small></a><p class="nav-label">PRACTICAL WORKSPACE</p><nav id="tutorialNav" aria-label="Tutorial navigation"></nav><a class="mri-link" href="/image-analysis">↗ MRI matching studio</a><p class="aside-note">Local computation<br>Reproducible experiments<br>Educational use</p></aside>
+<main><header><span>Healthcare research / <b>Analytics laboratory</b></span><span id="connection" role="status">Connecting…</span></header>
+<section class="hero"><div><p class="eyebrow">EXPLORE. ANALYZE. UNDERSTAND.</p><h1>From healthcare data<br>to meaningful insight.</h1><p>Fifteen practical tutorials spanning medical imaging, clinical language and operational analytics.</p></div><div class="hero-number">15<span>CONNECTED TUTORIALS</span></div></section>
+<section class="overview" aria-label="Laboratory overview"><div><small>01 — IMAGING</small><b>T1–T6</b><span>MRI processing & visualization</span></div><div><small>02 — OPERATIONS & TEXT</small><b>T7–T12</b><span>Planning, prediction & language</span></div><div><small>03 — RESEARCH</small><b>T13–T15</b><span>Exploration & behavioral factors</span></div></section>
+<section class="workspace"><div class="section-heading"><div><p class="eyebrow" id="tutorialNumber">TUTORIAL 07</p><h2 id="title">Patient prediction for improved staffing</h2></div><span class="pill" id="runState">Ready to run</span></div>
+<p id="method"></p><div class="dataset-notice" id="datasetInfo"></div><p class="schema" id="schema"></p>
+<form id="analysisForm"><div class="inputs"><div id="fileControls"><label for="csv">Dataset (optional UTF-8 CSV, max 2 MB)</label><input id="csv" type="file" accept=".csv,text/csv"><a id="exampleLink" href="/api/tutorials/7/example">Download labeled synthetic example CSV</a><p>Leave file empty to run the synthetic example. Uploaded CSV stays in memory for this request.</p></div><div id="textControls" hidden><label for="clinicalText">Text to classify, extract or disambiguate</label><textarea id="clinicalText" rows="4" maxlength="20000">No fever. Diabetes treated with metformin 500 mg. MS with neurological symptoms.</textarea></div><div id="queryControls" hidden><label for="query">Document ranking query</label><input id="query" value="diabetes glucose" maxlength="1000"></div><div id="clusterControls" hidden><label for="clusters">Number of clusters</label><input type="number" id="clusters" min="2" max="10" value="3" required></div><div id="workloadControls"><label for="workload">Illustrative admissions per staff per day</label><input type="number" id="workload" min="0.1" max="100" step="0.1" value="8" required></div></div><div class="actions"><button type="submit" id="run">Run analysis <span>→</span></button><button type="button" id="cnn" hidden>Run compact CNN training & inference</button><button type="button" class="secondary" id="download" hidden>Export result JSON</button></div></form>
+<p id="status" role="status" aria-live="polite">Choose a tutorial and run an analysis to compute results.</p><div id="results"></div></section>
+<footer>HER / Healthcare Analytics Laboratory <span>Computed results · Transparent sources · Reproducible methods</span></footer></main></body></html>

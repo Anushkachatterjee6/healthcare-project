@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Image Analysis — SIFT + RANSAC | HER</title>
+  <title>Image Analysis Studio — SIFT + RANSAC and CNN | HER</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/studio-cnn.css" />
 </head>
 <body>
   <div class="bg-grid"></div>
@@ -20,7 +21,11 @@
   </header>
 
   <main class="analysis-wrap">
-    <section class="panel controls-panel">
+    <nav class="studio-workflows" aria-label="Studio workflows">
+      <a href="#sift-analysis">SIFT + RANSAC</a>
+      <a href="#cnn-analysis">CNN Analysis</a>
+    </nav>
+    <section class="panel controls-panel" id="sift-analysis">
       <p class="eyebrow">T5 — Biomedical Image Analysis</p>
       <h1>IMAGE ANALYSIS — SIFT + RANSAC</h1>
       <p class="explain">
@@ -112,8 +117,23 @@
         <img id="ransac" alt="RANSAC inlier matches" />
       </figure>
     </section>
+    <section class="panel studio-cnn" id="cnn-analysis" aria-labelledby="cnnHeading">
+      <p class="eyebrow">T5 — CNN classification</p>
+      <h2 id="cnnHeading">CNN Analysis</h2>
+      <p class="explain">Run the same compact training and evaluation workflow as the tutorials dashboard, using local cases with both FLAIR MRI and reference segmentation labels.</p>
+      <div class="doc-cols">
+        <div><h3>Input and training</h3><p>Cases and slices are selected automatically from the local labeled dataset. The existing demo uses 32 × 32 model inputs, up to eight sampled slices per case and three training epochs, with different patients reserved for validation.</p></div>
+        <div><h3>Classification output</h3><p>Displays actual input images, available reference masks, class labels and model scores. This classifier does not generate segmentation masks. Each run trains a fresh demo model; saved weights are not loaded or changed.</p></div>
+      </div>
+      <p class="hint">The SIFT case/modality/slice selectors apply only to SIFT. This CNN endpoint does not accept uploads or a single selected image; no uploaded image is silently replaced with demo data. Dataset and training settings are fixed by the existing endpoint.</p>
+      <div class="cta-row"><button id="cnnStudioRun" type="button" class="btn primary" aria-describedby="cnnStudioStatus">Train &amp; evaluate CNN</button></div>
+      <p id="cnnStudioStatus" class="status" role="status" aria-live="polite">Ready to run the local labeled-data CNN experiment.</p>
+      <div id="cnnStudioResults" class="studio-cnn-results" hidden aria-busy="false"></div>
+    </section>
   </main>
 
   <script src="/static/image-analysis.js"></script>
+  <script src="/static/results-renderer.js"></script>
+  <script src="/static/studio-cnn.js"></script>
 </body>
 </html>

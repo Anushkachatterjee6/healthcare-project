@@ -46,7 +46,7 @@ def _prepare_slice(mri_slice: np.ndarray, mask_slice: np.ndarray, target_size=(1
 
     mri_slice = minmax_normalize(mri_slice)
     mri_slice = resize_slice(mri_slice, target_size)
-    mask_slice = resize_slice(mask_slice, target_size)
+    mask_slice = cv2.resize(mask_slice.astype(np.float32), target_size, interpolation=cv2.INTER_NEAREST)
     # Keep mask labels discrete after resize.
     mask_bin = (mask_slice > 0).astype(np.float32)
     label = int(np.any(mask_bin > 0))
@@ -276,10 +276,11 @@ def evaluate_tumor_cnn(model, X_val, y_val) -> dict[str, Any]:
         "precision": float(precision_score(y_true, preds, zero_division=0)),
         "recall": float(recall_score(y_true, preds, zero_division=0)),
         "f1": float(f1_score(y_true, preds, zero_division=0)),
-        "confusion_matrix": confusion_matrix(y_true, preds),
+        "confusion_matrix": confusion_matrix(y_true, preds, labels=[0, 1]),
         "classification_report": classification_report(
             y_true,
             preds,
+            labels=[0, 1],
             target_names=["No Tumor", "Tumor Present"],
             zero_division=0,
         ),
