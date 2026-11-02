@@ -55,9 +55,10 @@
     root.append(node('p',result.dataset,'dataset-notice'));
     if(cnn)renderCNNImages(root,result);
     renderTextAnnotations(root,result.annotations);
-    if(result.tutorial===10&&(result.tables?.clusters||[]).length){
+    const clusterRows=result.tables?.clusters||result.tables?.cluster_representatives||[];
+    if(result.tutorial===10&&clusterRows.length){
       const section=node('section',undefined,'cluster-terms');section.append(node('h3','Cluster Representatives'));
-      for(const cluster of result.tables.clusters){const card=node('article');card.append(node('h4',`Cluster ${cluster.cluster} · ${cluster.size} training documents`),node('p',cluster.terms));section.append(card);}root.append(section);
+      for(const cluster of clusterRows){const card=node('article');card.append(node('h4',`Cluster ${cluster.cluster} · ${cluster.size} training documents`),node('p',cluster.terms));section.append(card);}root.append(section);
     }
     const metrics=node('div',undefined,'metrics');
     for(const [key,value] of Object.entries(result.metrics||{})){const card=node('div',undefined,'metric');card.append(node('small',key.replaceAll('_',' ')),node('strong',fmt(value)));metrics.append(card);}root.append(metrics);

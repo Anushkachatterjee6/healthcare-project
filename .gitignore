@@ -2,8 +2,11 @@
 __pycache__/
 *.pyc
 .env
+.env.*
+!.env.example
 .venv/
 venv/
+env/
 node_modules/
 .next/
 dist/
@@ -14,3 +17,11 @@ BraTS2020/
 *.h5
 artifacts/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+*.log
+*.tmp
+*.bak
+app_data/
+grayscale-image_research_report_corrected.pdf

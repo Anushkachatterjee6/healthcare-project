@@ -53,6 +53,12 @@ def _prepare_slice(mri_slice: np.ndarray, mask_slice: np.ndarray, target_size=(1
     return mri_slice.astype(np.float32), mask_bin, label
 
 
+def preprocess_inference_slice(mri_slice: np.ndarray, target_size=(128, 128)) -> np.ndarray:
+    """Apply the exact MRI-input branch of training preprocessing without a mask."""
+    image, _, _ = _prepare_slice(mri_slice, np.zeros_like(mri_slice), target_size)
+    return image[..., None].astype(np.float32)
+
+
 def discover_labeled_cases(data_root: str | Path | None = None) -> list[dict]:
     """Return cases that have both FLAIR and segmentation."""
     cases = discover_cases(data_root or default_data_root())

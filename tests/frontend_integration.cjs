@@ -6,20 +6,24 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const httpFetch = global.fetch;
 const baseURL = process.env.HER_TEST_BASE_URL || 'http://127.0.0.1:8000';
+const dynamicElements={};
 class Element {
-  constructor(tag='div'){this.tagName=tag;this.children=[];this.dataset={};this.listeners={};this.hidden=false;this.value='';this.files=[];this.textContent='';this.className='';this.classList={toggle:()=>{},remove:()=>{}};}
+  constructor(tag='div'){this.tagName=tag;this.children=[];this.dataset={};this.listeners={};this.hidden=false;this.value='';this.files=[];this.textContent='';this.className='';this.classList={toggle:()=>{},remove:()=>{}};Object.defineProperty(this,'id',{get:()=>this._id,set:value=>{this._id=value;if(value)dynamicElements[value]=this;}});}
   append(...els){this.children.push(...els);}
   appendChild(el){this.append(el);}
   replaceChildren(...els){this.children=els;}
-  setAttribute(){}
+  setAttribute(name,value){this[name]=String(value);}
+  removeAttribute(name){delete this[name];}
   addEventListener(type,fn){this.listeners[type]=fn;}
   querySelector(selector){if(selector==='small')return this.children.find(c=>c.tagName==='small');const match=selector.match(/data-id="(\d+)"/);return match?this.children.find(c=>c.dataset.id==match[1]):null;}
   click(){this.listeners.click?.();}
 }
 const html=fs.readFileSync('frontend/index.html','utf8');
 const elements=Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(m=>[m[1],new Element()]));
-elements.clusters.value='3';elements.workload.value='8';elements.query.value='diabetes glucose';elements.clinicalText.value='diabetes metformin 500 mg; MS neurological interferon';
-global.document={getElementById:id=>{assert.ok(elements[id],`missing DOM id ${id}`);return elements[id];},createElement:tag=>new Element(tag)};
+Object.assign(dynamicElements,elements);
+const formParent=new Element('section');formParent.insertBefore=(child,reference)=>{const index=formParent.children.indexOf(reference);formParent.children.splice(index<0?formParent.children.length:index,0,child);child.parentElement=formParent;};formParent.append(elements.analysisForm);elements.analysisForm.parentElement=formParent;
+elements.clusters.value='3';elements.query.value='glioma surrounding edema';elements.clinicalText.value='Glioma in frontal lobe with edema measures 12 mm.';
+global.document={getElementById:id=>{assert.ok(dynamicElements[id],`missing DOM id ${id}`);return dynamicElements[id];},createElement:tag=>new Element(tag)};
 global.location={hash:''};
 let latestTutorialResult=null;
 global.fetch=async(path,opts)=>{
@@ -36,7 +40,17 @@ const waitFor=async(predicate)=>{const start=Date.now();while(!predicate()){if(D
   for(let id=1;id<=15;id++){
     elements.tutorialNav.children[id-1].click();
     assert.equal(elements.tutorialNumber.textContent,`TUTORIAL ${String(id).padStart(2,'0')}`);
-    if(id===11)elements.clinicalText.value='<img src=x onerror=alert(1)> No fever. Diabetes treated with metformin 500 mg. MS neurological interferon.';
+    if(id===10)dynamicElements.t10Clustering.click();
+    if([10,11,12].includes(id)){
+      assert.equal(elements.fileControls.hidden,false,`T${id} must expose the synthetic text CSV controls`);
+      assert.equal(elements.exampleLink.hidden,false,`T${id} must expose the synthetic text CSV download`);
+      assert.equal(elements.exampleLink.href,`/api/tutorials/${id}/example`);
+    } else {
+      assert.equal(elements.fileControls.hidden,true,`T${id} must not expose text upload controls`);
+      assert.equal(elements.exampleLink.hidden,true,`T${id} must not expose a synthetic text CSV download`);
+      assert.equal(elements.exampleLink.href,undefined,`T${id} must not retain an unsupported example URL`);
+    }
+    if(id===11)elements.clinicalText.value='<img src=x onerror=alert(1)> Glioma in frontal lobe with edema measures 12 mm.';
     elements.analysisForm.listeners.submit({preventDefault(){}});
     await waitFor(()=>!elements.run.disabled);
     assert.equal(elements.runState.textContent,'Run completed',elements.status.textContent);
@@ -53,7 +67,7 @@ const waitFor=async(predicate)=>{const start=Date.now();while(!predicate()){if(D
     }
     if(id===10){
       const terms=elements.results.children.find(el=>el.className==='cluster-terms');assert.ok(terms);
-      assert.equal(terms.children.filter(el=>el.tagName==='article').length,latestTutorialResult.tables.clusters.length);
+      assert.equal(terms.children.filter(el=>el.tagName==='article').length,(latestTutorialResult.tables.clusters||latestTutorialResult.tables.cluster_representatives).length);
     }
     if(id===11){
       const section=elements.results.children.find(el=>el.className==='text-annotations');assert.ok(section);
@@ -131,8 +145,9 @@ const waitFor=async(predicate)=>{const start=Date.now();while(!predicate()){if(D
   elements.analysisForm.listeners.submit({preventDefault(){}});await waitFor(()=>!elements.run.disabled);
   assert.ok(elements.results.children.some(el=>el.textContent.includes('No plot applies')));
   global.fetch=liveFetch;
-  elements.tutorialNav.children[6].click();
-  const csv=await (await fetch('/api/tutorials/7/example')).text();
+  elements.tutorialNav.children[9].click();
+  dynamicElements.t10Classification.click();
+  const csv=await (await fetch('/api/tutorials/10/example')).text();
   elements.csv.files=[{name:'demo.csv',size:csv.length,text:async()=>csv}];
   elements.analysisForm.listeners.submit({preventDefault(){}});await waitFor(()=>!elements.run.disabled);
   assert.equal(elements.runState.textContent,'Run completed');

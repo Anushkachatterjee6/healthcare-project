@@ -17,3 +17,4 @@ nbformat>=5.9
 nbclient>=0.9
 ipykernel>=6.25
 pillow>=10
+reportlab>=5.1

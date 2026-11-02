@@ -20,25 +20,26 @@ CNN_LOCK = threading.Lock()
 class AnalysisRequest(BaseModel):
     records: list[dict] | None = Field(None, max_length=5000)
     text: str = Field('', max_length=20000)
-    query: str = Field('diabetes glucose', max_length=1000)
+    query: str = Field('glioma surrounding edema', max_length=1000)
     clusters: int = Field(3, ge=2, le=10)
-    workload: float = Field(8, gt=0, le=100)
+    operation: str = Field('classification', pattern='^(classification|clustering)$')
+    workload: float = Field(8, gt=0, le=100, description='Legacy field; not used by MRI tutorials')
 
 
 @router.get('/tutorials')
 def metadata():
     cases = discover_cases()
     return {'tutorials':[{'id':i,'title':title,'status':'implemented',
-        'dataset_status':f'{len(cases)} local MRI cases' if i<=6 else 'Synthetic example ready; CSV accepted',
-        'source':'Local BraTS-style NIfTI files' if i<=6 else 'Locally generated deterministic synthetic data, seed 42',
-        'columns':[] if i<=6 else list(example_data(i).columns),
-        'required_columns':['date','admissions'] if i in (7,8,9) else (['text'] if i in (11,12) else ([] if i<=6 else list(example_data(i).columns))),
+        'dataset_status':f'{len(cases)} local MRI cases' if i not in (10,11,12) else 'Synthetic brain-tumour text example ready; CSV accepted',
+        'source':'Local BraTS-style NIfTI files' if i not in (10,11,12) else 'Locally generated synthetic brain-tumour report templates',
+        'columns':list(example_data(i).columns) if i in (10,11,12) else [],
+        'required_columns':(['text','label'] if i==10 else ['text']) if i in (10,11,12) else [],
         'endpoint':f'/api/tutorials/{i}/run'} for i,title in enumerate(TITLES,1)]}
 
 
 @router.get('/tutorials/{tutorial}/example')
 def example(tutorial:int):
-    if tutorial not in range(7,16): raise HTTPException(404,'Example available for T7–T15')
+    if tutorial not in (10,11,12): raise HTTPException(404,'Synthetic text examples are available for T10–T12 only; all other tutorials use local MRI files')
     from fastapi.responses import Response
     return Response(example_data(tutorial).to_csv(index=False),media_type='text/csv',headers={'Content-Disposition':f'attachment; filename=T{tutorial}_SYNTHETIC_example.csv'})
 
@@ -46,7 +47,7 @@ def example(tutorial:int):
 def execute(tutorial, body):
     try:
         if tutorial in range(1,7): return mri_tutorial(tutorial)
-        return run_analysis(tutorial, body.records, text=body.text, query=body.query, clusters=body.clusters,workload=body.workload)
+        return run_analysis(tutorial, body.records, text=body.text, query=body.query, clusters=body.clusters, operation=body.operation, workload=body.workload)
     except (ValueError,KeyError,TypeError) as exc:
         raise HTTPException(422,str(exc)) from exc
     except (FileNotFoundError,ImportError) as exc:
@@ -77,7 +78,7 @@ async def bounded_body(request):
 
 @router.post('/tutorials/{tutorial}/upload')
 async def upload(tutorial:int,request:Request):
-    if tutorial not in range(7,16): raise HTTPException(404,'CSV upload supported for T7–T15')
+    if tutorial not in (10,11,12): raise HTTPException(404,'CSV upload is supported only for T10–T12 clinical-text tutorials; other tutorials use local MRI files')
     if request.headers.get('content-type','').split(';')[0] not in ('text/csv','application/csv'):
         raise HTTPException(415,'Upload UTF-8 CSV with Content-Type: text/csv')
     raw=await bounded_body(request)
@@ -85,7 +86,7 @@ async def upload(tutorial:int,request:Request):
         df=pd.read_csv(BytesIO(raw),encoding='utf-8',nrows=5001)
         if len(df)>5000 or len(df.columns)>50: raise ValueError('Limit: 5000 rows and 50 columns')
         data=json.loads(df.to_json(orient='records'))
-        body=AnalysisRequest(records=data,text=request.query_params.get('text',''),query=request.query_params.get('query','diabetes glucose'),clusters=request.query_params.get('clusters',3),workload=request.query_params.get('workload',8))
+        body=AnalysisRequest(records=data,text=request.query_params.get('text',''),query=request.query_params.get('query','glioma surrounding edema'),clusters=request.query_params.get('clusters',3),operation=request.query_params.get('operation','classification'),workload=request.query_params.get('workload',8))
     except (ValueError,UnicodeError,pd.errors.ParserError) as exc:
         raise HTTPException(422,'Invalid CSV or options: '+str(exc)[:250]) from exc
     return await run_in_threadpool(execute,tutorial,body)
